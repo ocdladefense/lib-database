@@ -1,0 +1,12 @@
+{
+    "name": "ocdladefense/lib-database",
+    "description": "A PHP databse library.",
+    "autoload": {
+        "classmap":[
+            "mysql/",
+            "salesforce/"
+        ],
+        "files":[]
+    },
+    "require": {}
+}
