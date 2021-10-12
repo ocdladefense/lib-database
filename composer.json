@@ -6,7 +6,11 @@
             "mysql/",
             "salesforce/"
         ],
-        "files":[]
+        "files":[
+            "DbException.php",
+            "IDbREsult",
+            "QueryException.php"
+        ]
     },
     "require": {}
 }
