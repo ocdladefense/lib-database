@@ -102,22 +102,35 @@ class Database {
 
 
 function select($query) {
+
 	$tokens = explode(" ", strtolower($query));
-	$tokens = implode(" ", array_filter($query));
+	$tokens = implode(" ", array_filter($tokens));
 	
-	$parts = preg_split("/\s(select|from|where)\s+/",$tokens);
-	
-	print_r($parts);
-	
-	
-	$fields = $parts[0];
-	$object = $parts[1];
-	$conditions = $parts[2];
-	
-	$results = MysqlDatabase::query($query);
+	$parts = preg_split("/\s*(select|from|where)\s+/",$tokens);
+
+    // There are some empty elements.
+    $parts = array_filter($parts);
 
 	
-	return new ListObject($object,$results);
+    // Needs to be title case.
+	$table = ucwords($parts[2]);
+
+
+    $myArrayOfCustomObjects = array();
+
+    $result = Database::query($query);
+
+    $records = $result->getIterator();
+
+    if(!class_exists($table)) return $records;
+
+
+    foreach($records as $record){
+
+        $myArrayOfCustomObjects[] = $table::from_array_or_standard_object($record);
+    }
+
+    return $myArrayOfCustomObjects;
 }
 
 
@@ -157,7 +170,6 @@ function insert($objs = array(), $isSalesforce = false){
     $builder->setValues($values);
     $sql = $builder->compile();
 
-    var_dump($sql);exit;
 
     $db = new Database();
     $insertResult = $db->insert($sql);
@@ -228,7 +240,7 @@ function getObjectFields($obj, $isUpdate = False){
 
     unset($fields["meta"]);
 
-    if($isUpdate = True){
+    if($isUpdate == True){
 
         $fields = array_filter($fields, function($field){
 
