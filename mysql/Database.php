@@ -145,7 +145,7 @@ function insert($objs = array(), $isSalesforce = false){
 
     $columns = getObjectFields($sample);
 
-    $values = getObjectValues($objs);;
+    $values = getObjectValues($objs);
     
     $tableName = strtolower(get_class($objs[0]));
 
@@ -156,6 +156,8 @@ function insert($objs = array(), $isSalesforce = false){
     $builder->setColumns($columns);
     $builder->setValues($values);
     $sql = $builder->compile();
+
+    var_dump($sql);exit;
 
     $db = new Database();
     $insertResult = $db->insert($sql);
@@ -218,6 +220,7 @@ function update($objs = array()){
 function getObjectFields($obj, $isUpdate = False){
 
     if($obj === null){
+
         throw new DbException("Given object cannot be null");
     }
 
