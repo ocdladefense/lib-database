@@ -198,7 +198,9 @@ function update($objs = array()){
     $builder->setValues($values);
     $sql = $builder->compile();
 
-    $sql .= " WHERE Id = '$id'";  // Totally cheating here.  I already know.
+    var_dump($sql);exit;
+
+    $sql .= " WHERE id = '$id'"; 
 
     $db = new Database();
     return $db->update($sql);

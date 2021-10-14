@@ -166,6 +166,8 @@ class QueryBuilder{
             return "INSERT INTO $this->tableName $columns VALUES $values";
         } else if($this->type == "update") {
             $fields = $this->prepareUpdateFields();
+
+            var_dump($fields);exit;
             return "UPDATE $this->tableName SET $fields".$this->whereClause();
         } else if($this->type == "delete") {
             return "DELETE FROM $this->tableName".$this->whereClause();
