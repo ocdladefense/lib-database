@@ -177,37 +177,45 @@ function update($objs = array()){
 
     $objs = !is_array($objs) ? [$objs] : $objs;
 
-    $id = $objs[0]->id;
+    $tableName = strtolower(get_class($objs[0]));
 
-    $columns = getObjectFields($objs[0]);
+    $columns = getObjectFields($objs[0], True);
 
     // Remove the Id column
     unset($columns[0]);
 
-    $values = getObjectValues($objs);
+    $values = getObjectValues($objs, True);
 
-    // remove the id key and value.  Can't have either.
-    array_shift($values[0]);
+    $sqlStatements = array();
+    foreach($values as $val){
+
+        $id = $val["id"];
+
+        array_shift($val); //Remvove the "id" field.
+
+        $builder = new QueryBuilder();
+        $builder->setType("update");
+        $builder->setTable($tableName);
+        $builder->setColumns($columns);
+        $builder->setValues(array($val));
+        $sql = $builder->compile();
     
-    $tableName = strtolower(get_class($objs[0]));
+        $sql .= " WHERE id = '$id'"; 
 
-    $builder = new QueryBuilder();
-    $builder->setType("update");
-    $builder->setTable($tableName);
-    $builder->setColumns($columns);
-    $builder->setValues($values);
-    $sql = $builder->compile();
+        $sqlStatements[] = $sql;
+    }
 
-    var_dump($sql);exit;
-
-    $sql .= " WHERE id = '$id'"; 
-
+    $results = array();
     $db = new Database();
-    return $db->update($sql);
+    foreach($sqlStatements as $sql) {
 
+        $results[] = $db->update($sql);
+    }
+
+    return $results;
 }
 
-function getObjectFields($obj){
+function getObjectFields($obj, $isUpdate = False){
 
     if($obj === null){
         throw new DbException("Given object cannot be null");
@@ -217,12 +225,34 @@ function getObjectFields($obj){
 
     unset($fields["meta"]);
 
+    if($isUpdate = True){
+
+        $fields = array_filter($fields, function($field){
+
+            return $field != null && $field != "";
+        });
+    }
+
     return array_keys($fields);
 }
 
-function getObjectValues($objs){
+function getObjectValues($obj, $isUpdate = False){
 
-    $values = array_map("get_object_vars",$objs);
+    $values = array_map("get_object_vars",$obj);
+
+    if($isUpdate == True){
+
+        $filtered = array();
+        foreach($values as $value){
+    
+            $filtered[] = array_filter($value, function($v){
+    
+                return $v != null && $v != "";
+            });
+        }
+    
+        return $filtered;
+    }
 
     return $values;
 }

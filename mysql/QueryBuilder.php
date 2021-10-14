@@ -160,20 +160,30 @@ class QueryBuilder{
 		}
 
     function compile(){
+
         if($this->type == "insert"){
+
             $columns = $this->prepareInsertColumns();
             $values = $this->prepareInsertValues();
+
             return "INSERT INTO $this->tableName $columns VALUES $values";
+
         } else if($this->type == "update") {
+
             $fields = $this->prepareUpdateFields();
 
-            var_dump($fields);exit;
             return "UPDATE $this->tableName SET $fields".$this->whereClause();
+
         } else if($this->type == "delete") {
+
             return "DELETE FROM $this->tableName".$this->whereClause();
+
         } else if($this->type == "count") {
+
             return $this->selectCountClause().$this->whereClause();
+
         } else {
+
             return $this->selectClause().$this->whereClause().$this->orderByClause().$this->limitClause();
         }
     }
@@ -253,6 +263,7 @@ class QueryBuilder{
     }
 
     function prepareUpdateFields(){
+        
         $fields = "";
         $tmp = array();
 
