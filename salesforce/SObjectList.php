@@ -1,7 +1,6 @@
 <?php
 
-
-
+namespace Salesforce;
 
 class SObjectList {
 	
