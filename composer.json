@@ -8,6 +8,7 @@
         ],
         "files":[
             "mysql/Database.php",
+            "QueryBuilder.php",
             "DbException.php",
             "IDbResult.php",
             "QueryException.php"
