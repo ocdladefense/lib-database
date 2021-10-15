@@ -2,7 +2,7 @@
 
 namespace Salesforce;
 
-class QueryBuilder extends \QueryBuilder{
+class QueryBuilder extends \QueryBuilderBase{
 
     
 }

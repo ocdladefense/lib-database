@@ -14,7 +14,7 @@ class DbHelper {
 
 		foreach($records as $record) {
 
-			$values[] = $record[$field];
+			$values[$record[$field]] = $record[$field];
 		}
 
 		return $values;

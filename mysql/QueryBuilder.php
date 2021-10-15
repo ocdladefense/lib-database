@@ -8,7 +8,7 @@ define("SQL_ROW_SEPERATOR",",");
 define("SQL_INSERT_ROW_START","(");
 define("SQL_INSERT_ROW_END",")");
 
-class QueryBuilder{
+class QueryBuilder extends \QueryBuilderBase{
 
     private $tableName;
     private $type;

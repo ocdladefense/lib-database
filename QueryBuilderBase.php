@@ -1,6 +1,6 @@
 <?php 
 
-class QueryBuilder{
+class QueryBuilderBase{
 
     public $baseQuery;
 
@@ -132,7 +132,7 @@ class QueryBuilder{
 
         $sql = "SELECT " . implode(", ", $this->fields) . " FROM $this->object";
         
-        if(!empty($this->conditions)) $sql .= " WHERE {$this->buildConditions()}" . $extra;
+        if(!empty($this->conditions["conditions"])) $sql .= " WHERE {$this->buildConditions()}" . $extra;
         
         if(!empty($this->orderBy)) $sql .= " ORDER BY $this->orderBy";
 

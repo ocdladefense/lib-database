@@ -106,7 +106,7 @@ function select($query, $returnObject = True) {
 	$tokens = explode(" ", strtolower($query));
 	$tokens = implode(" ", array_filter($tokens));
 	
-	$parts = preg_split("/\s*(select|from|where)\s+/",$tokens);
+	$parts = preg_split("/\s*(select|from|where|order by)\s+/",$tokens);
 
     // There are some empty elements.
     $parts = array_filter($parts);
@@ -127,10 +127,10 @@ function select($query, $returnObject = True) {
 
     foreach($records as $record){
 
-        $myArrayOfCustomObjects[] = $table::from_array_or_standard_object($record);
+        $customObjects[] = $table::from_array_or_standard_object($record);
     }
 
-    return $myArrayOfCustomObjects;
+    return $customObjects;
 }
 
 
