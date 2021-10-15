@@ -4,7 +4,8 @@ namespace Salesforce;
 
 
 
-
+// Changed the name to SObject 2, because there was a namespacing conflict the "lib-salesforce-rest-api" repository.
+// I don't think it is being used.  I could be wrong though...
 class SObject2 implements \Http\IJson {
 
 	protected $id = null;
