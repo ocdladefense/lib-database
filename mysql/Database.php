@@ -101,7 +101,7 @@ class Database {
 // THESE GLOBAL FUNCTIONS ARE OUTSIDE OF THE DATABASE CLASS!
 
 
-function select($query) {
+function select($query, $returnObject = True) {
 
 	$tokens = explode(" ", strtolower($query));
 	$tokens = implode(" ", array_filter($tokens));
@@ -122,7 +122,7 @@ function select($query) {
 
     $records = $result->getIterator();
 
-    if(!class_exists($table)) return $records;
+    if(!class_exists($table) || $returnObject == False) return $records;
 
 
     foreach($records as $record){
