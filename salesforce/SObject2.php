@@ -5,7 +5,7 @@ namespace Salesforce;
 
 
 
-class SObject implements \Http\IJson {
+class SObject2 implements \Http\IJson {
 
 	protected $id = null;
 	
