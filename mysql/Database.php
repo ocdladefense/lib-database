@@ -116,7 +116,7 @@ function select($query, $returnObject = True) {
 	$table = ucwords($parts[2]);
 
 
-    $myArrayOfCustomObjects = array();
+    $customObjects = array();
 
     $result = Database::query($query);
 
@@ -130,7 +130,7 @@ function select($query, $returnObject = True) {
         $customObjects[] = $table::from_array_or_standard_object($record);
     }
 
-    return $customObjects;
+    return $customObjects; // count($customObjects) === 1 ? $customObjects[0] : $customObjects;
 }
 
 
@@ -163,7 +163,7 @@ function insert($objs = array(), $isSalesforce = false){
     $tableName = strtolower(get_class($objs[0]));
 
     //use the querybuilder to build insert statement
-    $builder = new \Mysql\QueryBuilder();
+    $builder = new QueryBuilder($tableName);
     $builder->setType("insert");
     $builder->setTable($tableName);
     $builder->setColumns($columns);
@@ -198,20 +198,20 @@ function update($objs = array()){
     // Remove the Id column
     unset($columns[0]);
 
-    $values = getObjectValues($objs, True);
+    $rows = getObjectValues($objs, True);
 
     $sqlStatements = array();
-    foreach($values as $val){
+    foreach($rows as $row){
 
-        $id = $val["id"];
+        $id = $row["id"];
 
-        array_shift($val); //Remvove the "id" field.
+        unset($row["id"]);
 
-        $builder = new QueryBuilder();
+        $builder = new QueryBuilder($tableName);
         $builder->setType("update");
         $builder->setTable($tableName);
         $builder->setColumns($columns);
-        $builder->setValues(array($val));
+        $builder->setValues(array($row));
         $sql = $builder->compile();
     
         $sql .= " WHERE id = '$id'"; 

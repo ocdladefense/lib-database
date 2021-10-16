@@ -11,8 +11,8 @@ define("SQL_INSERT_ROW_END",")");
 class QueryBuilder extends \QueryBuilderBase{
 
     private $tableName;
-    private $type;
-    private $conditions = array();
+    private $type = "select";
+    // private $conditions = array();
     private $sortConditions = array();
     private $limitCondition;
     private $columns = array();
@@ -20,7 +20,9 @@ class QueryBuilder extends \QueryBuilderBase{
     private $updateFields = array();
     private $uikvps = array();
 
-    function __construct(){
+    function __construct($objectName){
+
+        $this->object = $objectName;
 
     }
 
@@ -32,9 +34,6 @@ class QueryBuilder extends \QueryBuilderBase{
         $this->type = $tp;
     }
 
-    function setConditions($conds){
-        $this->conditions = $conds;
-    }
 
     function setSortConditions($conds){
         $this->sortConditions = $conds;
@@ -70,6 +69,8 @@ class QueryBuilder extends \QueryBuilderBase{
     }
     
     function whereClause(){
+
+        if($this->conditions == null) return "";
         $where = "";
         $tmp = array();
         
@@ -161,6 +162,11 @@ class QueryBuilder extends \QueryBuilderBase{
 
     function compile(){
 
+        if($this->type == "select") {
+
+            return parent::compile();
+        }
+
         if($this->type == "insert"){
 
             $columns = $this->prepareInsertColumns();
@@ -182,9 +188,6 @@ class QueryBuilder extends \QueryBuilderBase{
 
             return $this->selectCountClause().$this->whereClause();
 
-        } else {
-
-            return $this->selectClause().$this->whereClause().$this->orderByClause().$this->limitClause();
         }
     }
 
