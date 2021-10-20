@@ -103,20 +103,13 @@ class Database {
 
 function select($query) {
 
-	// Sample query for testing.
-	// $query = "select id, name from car where id = 'foobar' order by name limit 25";
+    $customObjects = array();
 
 	$tokens = explode(" ", strtolower($query));
 	$sql = implode(" ", array_filter($tokens));
-	
-	// $parts = preg_split("/\s*(select|from|where|order by|limit)\s+/",$tokens);
+    $primaryKey = "id";
 
 	$sqlCopy = $sql;
-	// $sql = "select id, name from car where id = 'foobar' order by name";	
-	// $sql = "select id, name from car where id = 'foobar' ";	
-	// $sql = "select id, name from car ";	
-	// $sql = "select id, name ";	
-	// $sql = ""; // after the last iteration.
 	
 	
 	$parts = array("select" => null,"from" => null,"where" => null,"order by" => null,"limit" => null);
@@ -131,23 +124,23 @@ function select($query) {
 		$value = $hasIt ? trim($keywords[1]) : null;
 		$sqlCopy = $keywords[0];
 	}
+
 	
     // There are some empty elements.
     // $parts = array_filter($parts);
-		$isPrimaryKey = true;
-		$isLimit1 = true;
+    $isPrimaryKey = strpos($parts["where"], $primaryKey) !== false;
+    $isLimit1 = $parts["limit"] == 1;
 	
     // Needs to be title case.
 	$table = ucwords($parts["from"]);
-
-
-    $customObjects = array();
 
     $result = Database::query($query);
 
     $records = $result->getIterator();
 
-    if(!class_exists($table)) return $records;
+    if(!class_exists($table)) {
+        return ($isPrimaryKey || $isLimit1) ? $records[0] : $records;
+    }
 
 
     foreach($records as $record){
@@ -155,7 +148,6 @@ function select($query) {
         $customObjects[] = $table::from_array_or_standard_object($record);
     }
 
-		// Return a single object when explictly requesting it, either through limit 1 or querying on the primary key (e.g., Id.)
     return ($isPrimaryKey || $isLimit1) ? $customObjects[0] : $customObjects;
 }
 
