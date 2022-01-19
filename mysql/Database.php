@@ -125,10 +125,13 @@ function select($query) {
 		$sqlCopy = $keywords[0];
 	}
 
-	
-    // There are some empty elements.
-    // $parts = array_filter($parts);
-    $isPrimaryKey = strpos($parts["where"], $primaryKey) !== false;
+
+    // If the query is filtering on the primary key return true
+    $isPrimaryKey = function() use ($parts, $primaryKey){
+
+        return strpos($parts["where"], "$primaryKey =") !== false || strpos($parts["where"], "$primaryKey=") !== false;
+    };
+
     $isLimit1 = $parts["limit"] == 1;
 	
     // Needs to be title case.
@@ -148,7 +151,7 @@ function select($query) {
         $customObjects[] = $table::from_array_or_standard_object($record);
     }
 
-    return ($isPrimaryKey || $isLimit1) ? $customObjects[0] : $customObjects;
+    return ($isPrimaryKey() || $isLimit1) ? $customObjects[0] : $customObjects;
 }
 
 
