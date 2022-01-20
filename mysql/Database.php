@@ -105,14 +105,22 @@ function select($query) {
 
     $customObjects = array();
 
+    $isPrimaryKey = false;
+
+
+    // We should not be setting the query to lower case.
+    // Need to figure out why not calling strtolower ends up in parts being all null values.
+    // Gotta have $parts to set the table name.
 	$tokens = explode(" ", strtolower($query));
+
+    // Probably shouldn't filter out double spaces in where clauses.
 	$sql = implode(" ", array_filter($tokens));
     $primaryKey = "id";
 
 	$sqlCopy = $sql;
 	
 	
-	$parts = array("select" => null,"from" => null,"where" => null,"order by" => null,"limit" => null);
+	$parts = array("select" => null,"from" => null,"where" => null, "group by" => null, "order by" => null,"limit" => null);
 	$parts = array_reverse($parts, true);
 	
 
@@ -125,12 +133,20 @@ function select($query) {
 		$sqlCopy = $keywords[0];
 	}
 
+    if(!empty($parts["where"])){
+        
+        $where = $parts["where"];
 
-    // If the query is filtering on the primary key return true
-    $isPrimaryKey = function() use ($parts, $primaryKey){
+        $whereParts = explode("=", $where);
 
-        return strpos($parts["where"], "$primaryKey =") !== false || strpos($parts["where"], "$primaryKey=") !== false;
-    };
+        $whereParts = array_map(function($part){
+            return trim($part);
+        }, $whereParts);
+
+        // Is the query filtering on the primary key?
+        $isPrimaryKey = in_array($primaryKey, $whereParts);
+    }
+
 
     $isLimit1 = $parts["limit"] == 1;
 	
@@ -142,6 +158,7 @@ function select($query) {
     $records = $result->getIterator();
 
     if(!class_exists($table)) {
+
         return ($isPrimaryKey || $isLimit1) ? $records[0] : $records;
     }
 
@@ -151,7 +168,7 @@ function select($query) {
         $customObjects[] = $table::from_array_or_standard_object($record);
     }
 
-    return ($isPrimaryKey() || $isLimit1) ? $customObjects[0] : $customObjects;
+    return ($isPrimaryKey || $isLimit1) ? $customObjects[0] : $customObjects;
 }
 
 

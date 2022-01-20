@@ -12,6 +12,8 @@ class QueryBuilderBase{
 
     public $orderBy;
 
+    public $groupBy;
+
 
 
     public function __construct($objectName){
@@ -66,6 +68,11 @@ class QueryBuilderBase{
     public function setOrderBy($orderBy) {
 
         $this->orderBy = $orderBy;
+    }
+
+    public function setGroupBy($groupBy){
+
+        $this->groupBy = $groupBy;
     }
 
 
@@ -133,6 +140,8 @@ class QueryBuilderBase{
         $sql = "SELECT " . implode(", ", $this->fields) . " FROM $this->object";
         
         if(!empty($this->conditions["conditions"])) $sql .= " WHERE {$this->buildConditions()}" . $extra;
+
+        if(!empty($this->groupBy)) $sql .= " GROUP BY " . $this->groupBy;
         
         if(!empty($this->orderBy)) $sql .= " ORDER BY $this->orderBy";
 
