@@ -151,7 +151,7 @@ function select($query) {
     $isLimit1 = $parts["limit"] == 1;
 	
     // Needs to be title case.
-	$table = ucwords($parts["from"]);
+	$table = ucwords($parts["from"]);  // this doesn't work if the string in not lowercase????
 
     $result = Database::query($query);
 
