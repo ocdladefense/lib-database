@@ -107,17 +107,15 @@ function select($query) {
 
     $isPrimaryKey = false;
 
-
-    // We should not be setting the query to lower case.
-    // Need to figure out why not calling strtolower ends up in parts being all null values.
-    // Gotta have $parts to set the table name.
-	$tokens = explode(" ", strtolower($query));
+	$tokens = explode(" ", $query);
 
     // Probably shouldn't filter out double spaces in where clauses.
 	$sql = implode(" ", array_filter($tokens));
     $primaryKey = "id";
 
-	$sqlCopy = $sql;
+    // The sql string needs to be lowercase, so that we can access indexes in the $parts array and perform other operations.(ex. get the table name);
+    // It has nothing to do with the actual query being passed to the Database::query() method.  T
+	$sqlCopy = strtolower($sql);
 	
 	
 	$parts = array("select" => null,"from" => null,"where" => null, "group by" => null, "order by" => null,"limit" => null);
