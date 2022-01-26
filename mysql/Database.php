@@ -8,26 +8,38 @@ use \DbException;
 class Database {
 
     private $connection;
+
     private $host;
+
     private $user;
+
     private $password;
+
     private $name;
 
-    function __construct($credentials = null){
+    // Can set default credentials to be used with any instance
+    // that doesn't provide its own set of credentials.
+    private static $defaultDb;
 
-        if(!empty($credentials)){
 
-            $this->host = $credentials["host"];
-            $this->user = $credentials["user"];
-            $this->password = $credentials["password"];
-            $this->name = $credentials["name"];
 
-        } else {
 
-            $this->host = defined("DB_HOST") ? DB_HOST : null;
-            $this->user = defined("DB_USER") ? DB_USER : null;
-            $this->password = defined("DB_PASS") ? DB_PASS : null;
-            $this->name = defined("DB_NAME") ? DB_NAME : null;
+    public static function setDefault($credentials) {
+
+        self::$defaultDb = $credentials;
+    }
+
+
+    function __construct($credentials = array()){
+
+        // Backwards compatible with Appserver framework:
+        // if the legacy globals are defined then use them.
+        if(defined("DB_HOST")) {
+
+            $this->host = DB_HOST;
+            $this->name = DB_NAME;
+            $this->user = DB_USER;
+            $this->password = DB_PASS;
         }
 
         $this->connect();
@@ -36,11 +48,21 @@ class Database {
 
 
     function connect(){
+        $params = self::$defaultDb;
 
-        $this->connection = new \Mysqli($this->host, $this->user, $this->password, $this->name);
+        // Legacy frameword does not set the default database connection this way.
+        if(null != self::$defaultDb) {
+            $this->connection = new \Mysqli($params["host"], $params["user"], $params["password"], $params["name"]);
+        }
+        else {
+            $this->connection = new \Mysqli($this->host, $this->user, $this->password, $this->name);
+        }
 
         if ($this->connection->connect_error) die("Connection failed: " . $this->connection->connect_error);
     }
+
+
+
 
     function insert($sql){
 
@@ -56,6 +78,9 @@ class Database {
         return new DbInsertResult($result,$id,$count,$this->connection->error);
     }
 
+
+
+
     function update($sql){
 
         $result = $this->connection->query($sql);
@@ -64,6 +89,9 @@ class Database {
         return new DbUpdateResult($result,$count,$this->connection->error);
     }
     
+
+
+
     public function delete($sql){
 
         $result = $this->connection->query($sql);
@@ -75,6 +103,9 @@ class Database {
         return new DbDeleteResult($result,$count,$this->connection->error);
     }
 
+
+
+    
     function select($sql){
 
         $result = $this->connection->query($sql);
@@ -83,9 +114,12 @@ class Database {
         return new DbSelectResult($result);
     }
     
-    public static function query($sql, $type = "select", $credentials){
 
-        $db = new Database($credentials);
+
+
+    public static function query($sql, $type = "select") {
+
+        $db = new Database();
 
         switch($type) {
             case "select":
@@ -120,7 +154,7 @@ class Database {
 // THESE GLOBAL FUNCTIONS ARE OUTSIDE OF THE DATABASE CLASS!
 
 
-function select($query, $credentials = null) {
+function select($query) {
 
     $customObjects = array();
 
@@ -170,7 +204,8 @@ function select($query, $credentials = null) {
     // Needs to be title case.
 	$table = ucwords($parts["from"]);
 
-    $result = Database::query($query, "select", $credentials);
+    
+    $result = Database::query($query);
 
     $records = $result->getIterator();
 
