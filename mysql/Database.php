@@ -124,14 +124,20 @@ function select($query, $credentials = null) {
 
     $customObjects = array();
 
-	$tokens = explode(" ", strtolower($query));
+    $isPrimaryKey = false;
+
+	$tokens = explode(" ", $query);
+
+    // Probably shouldn't filter out double spaces in where clauses.
 	$sql = implode(" ", array_filter($tokens));
     $primaryKey = "id";
 
-	$sqlCopy = $sql;
+    // The sql string needs to be lowercase, so that we can access indexes in the $parts array and perform other operations.(ex. get the table name);
+    // It has nothing to do with the actual query being passed to the Database::query() method.  T
+	$sqlCopy = strtolower($sql);
 	
 	
-	$parts = array("select" => null,"from" => null,"where" => null,"order by" => null,"limit" => null);
+	$parts = array("select" => null,"from" => null,"where" => null, "group by" => null, "order by" => null,"limit" => null);
 	$parts = array_reverse($parts, true);
 	
 
@@ -144,10 +150,21 @@ function select($query, $credentials = null) {
 		$sqlCopy = $keywords[0];
 	}
 
-	
-    // There are some empty elements.
-    // $parts = array_filter($parts);
-    $isPrimaryKey = strpos($parts["where"], $primaryKey) !== false;
+    if(!empty($parts["where"])){
+        
+        $where = $parts["where"];
+
+        $whereParts = explode("=", $where);
+
+        $whereParts = array_map(function($part){
+            return trim($part);
+        }, $whereParts);
+
+        // Is the query filtering on the primary key?
+        $isPrimaryKey = in_array($primaryKey, $whereParts);
+    }
+
+
     $isLimit1 = $parts["limit"] == 1;
 	
     // Needs to be title case.
@@ -158,6 +175,7 @@ function select($query, $credentials = null) {
     $records = $result->getIterator();
 
     if(!class_exists($table)) {
+
         return ($isPrimaryKey || $isLimit1) ? $records[0] : $records;
     }
 

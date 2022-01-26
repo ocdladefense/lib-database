@@ -14,7 +14,9 @@ class DbHelper {
 
 		foreach($records as $record) {
 
-			$values[$record[$field]] = $record[$field];
+			$trimmed = trim($record[$field]);
+
+			$values[$trimmed] = $trimmed;
 		}
 
 		return $values;
