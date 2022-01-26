@@ -8,14 +8,36 @@ use \DbException;
 class Database {
 
     private $connection;
+    private $host;
+    private $user;
+    private $password;
+    private $name;
 
-    function __construct($alias = null){
-        $this->connect($alias);
+    function __construct($credentials = null){
+
+        if(!empty($credentials)){
+
+            $this->host = $credentials["host"];
+            $this->user = $credentials["user"];
+            $this->password = $credentials["password"];
+            $this->name = $credentials["name"];
+
+        } else {
+
+            $this->host = defined("DB_HOST") ? DB_HOST : null;
+            $this->user = defined("DB_USER") ? DB_USER : null;
+            $this->password = defined("DB_PASS") ? DB_PASS : null;
+            $this->name = defined("DB_NAME") ? DB_NAME : null;
+        }
+
+        $this->connect();
     }
 
-    function connect($credentials = array()){
 
-        $this->connection = new \Mysqli(DB_HOST,DB_USER,DB_PASS,DB_NAME);
+
+    function connect(){
+
+        $this->connection = new \Mysqli($this->host, $this->user, $this->password, $this->name);
 
         if ($this->connection->connect_error) die("Connection failed: " . $this->connection->connect_error);
     }
@@ -39,9 +61,6 @@ class Database {
         $result = $this->connection->query($sql);
         if($result !== true) throw new DbException("Error updating data.  " . $this->connection->error);
 
-        // $count = mysqli_affected_rows($this->connection);
-        // if($count == 0) throw new DbException("There were ". $count . " rows updated.");
-
         return new DbUpdateResult($result,$count,$this->connection->error);
     }
     
@@ -64,9 +83,9 @@ class Database {
         return new DbSelectResult($result);
     }
     
-    public static function query($sql, $type = "select"){
+    public static function query($sql, $type = "select", $credentials){
 
-        $db = new Database();
+        $db = new Database($credentials);
 
         switch($type) {
             case "select":
@@ -101,7 +120,7 @@ class Database {
 // THESE GLOBAL FUNCTIONS ARE OUTSIDE OF THE DATABASE CLASS!
 
 
-function select($query) {
+function select($query, $credentials = null) {
 
     $customObjects = array();
 
@@ -134,7 +153,7 @@ function select($query) {
     // Needs to be title case.
 	$table = ucwords($parts["from"]);
 
-    $result = Database::query($query);
+    $result = Database::query($query, "select", $credentials);
 
     $records = $result->getIterator();
 
