@@ -134,13 +134,22 @@ class QueryBuilderBase{
 
 
     public function compile() {
+        $cond = false;
 
-        $extra = !empty($this->conditions["extra"]) ? implode(" ", $this->conditions["extra"]) : null;
+        
 
         $sql = "SELECT " . implode(", ", $this->fields) . " FROM $this->object";
         
-        if(!empty($this->conditions["conditions"])) $sql .= " WHERE {$this->buildConditions()}" . $extra;
+        if(!empty($this->conditions["conditions"])) {
+            $cond = true;
+            $sql .= " WHERE {$this->buildConditions()}";
+        }
 
+        if(!empty($this->conditions["extra"])) {
+            $sql .= (!$cond ? " WHERE " : " AND ");
+            $sql .= implode(" ", $this->conditions["extra"]);
+        }
+        
         if(!empty($this->groupBy)) $sql .= " GROUP BY " . $this->groupBy;
         
         if(!empty($this->orderBy)) $sql .= " ORDER BY $this->orderBy";
