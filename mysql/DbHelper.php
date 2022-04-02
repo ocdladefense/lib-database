@@ -22,6 +22,23 @@ class DbHelper {
 	}
 
 
+    /**
+     * If the query contains a special colon sequence,
+     * replace that sequence with a comma-separated array pattern.
+     */
+    public static function parseArray($query,$array) {
+        static $COMMA_SEPARATOR = ",";
+        
+        if(strpos($query, ":array") === -1) return $query;
+
+        $query = str_replace(":array", "%s", $query);
+        $key = array_key_first($array);
+
+        $fn = is_numeric($array[$key]) ? function($val){ return $val; } : function($val) { return sprintf("'%s'",$val);};
+
+        $values = implode($COMMA_SEPARATOR, array_map($fn, $array));
+        return sprintf($query,$values);
+    }
 
 
 

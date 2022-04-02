@@ -32,7 +32,7 @@ class DbSelectResult extends DbResult implements \IDbResult, \IteratorAggregate 
 
 
 
-    public function getIterator(){
+    public function getIterator() {
         if(!$this->done) {
             $this->read();
         }
@@ -41,7 +41,7 @@ class DbSelectResult extends DbResult implements \IDbResult, \IteratorAggregate 
     }
 
     
-    public function getValues($fieldName){
+    public function getValues($fieldName) {
         if(!$this->done) {
             $this->read();
         }
@@ -53,12 +53,12 @@ class DbSelectResult extends DbResult implements \IDbResult, \IteratorAggregate 
 	
     public function each($func) {
     
-            $arr = array();
-            foreach($this as $result) {
-                $arr[] = $func($result);
-            }
-            
-            return $arr;
+        $arr = array();
+        foreach($this as $result) {
+            $arr[] = $func($result);
+        }
+        
+        return $arr;
     }
 
     public function hasError(){}

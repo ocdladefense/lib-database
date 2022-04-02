@@ -106,9 +106,13 @@ class Database {
 
 
     
-    function select($sql){
-
-        $result = $this->connection->query($sql);
+    function select($sql) {
+        $args = func_get_args();
+        $sql = array_shift($args);
+        
+        $query = func_num_args() > 1 ? DbHelper::parseArray($sql,$args[0]) : $sql;
+        
+        $result = $this->connection->query($query);
         if(!$result) throw new DbException($this->connection->error);
 
         return new DbSelectResult($result);
