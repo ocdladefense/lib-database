@@ -93,9 +93,14 @@ class QueryBuilderBase{
 
     public function setConditions($fields, $values = null, $removeEmpty = True){
 
-        empty($values) ? $this->conditions = $fields : $this->conditions = self::mergeValues($fields, $values, $removeEmpty);
-    
+        $this->conditions = empty($values) ? $fields : self::mergeValues($fields, $values, $removeEmpty);
     }
+
+    
+    public function getConditions() {
+        return $this->conditions;
+    }
+
 
     public static function mergeValues($fields, $values = null, $removeEmpty = True) {
 
