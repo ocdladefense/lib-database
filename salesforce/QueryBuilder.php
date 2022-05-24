@@ -22,9 +22,6 @@ class QueryBuilder extends \QueryBuilderBase{
     }
 
     
-    // This is a function expression.  Notice how we assign the function
-    // the same way we assign a value to any other $variable.  The expression is
-    // on the right-hand side of the equals operator.
     // NOTE: We eventually need to solve for unary operators like
     // IS NULL, IS NOT NULL and Functions. 
     public static function objectToSqlCondition($obj) {   
