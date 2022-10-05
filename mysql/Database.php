@@ -47,6 +47,13 @@ class Database {
 
 
 
+    function getConnection() {
+
+        return $this->connection;
+    }
+
+
+
     function connect(){
         $params = self::$defaultDb;
 
